@@ -60,7 +60,7 @@ def index():
         ],
     }
 
-    # routes CRUD empresas
+    # routes CRUD companies
 
 
 @app.route("/companies", methods=["GET"])
