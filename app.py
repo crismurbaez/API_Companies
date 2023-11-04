@@ -177,14 +177,14 @@ def create_company():
         country,
         details,
     ) = request.json.values()
-    # Consulto si ya existe un company con ese code
+    # Consulto si ya existe una company con ese code
     result_get = get_company(code)
     if result_get.status_code != 404:
         error = error_create("This company " + code + " already exists")
         error_response = error.json
         return error_response
 
-    # Si el company con ese code no existe se crea el company
+    # Si la company con ese code no existe se crea el company
     if code and name and email:
         result = mongo.db.companies.insert_one(
             {
