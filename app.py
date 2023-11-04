@@ -140,7 +140,7 @@ def update_company(code):
             response_message = {
                 "message": "service updated successfully",
                 "_id": response_json["_id"],
-                "codigo": response_json["codigo"],
+                "code": response_json["code"],
                 "service_new": {
                     "name": name,
                     "website": website,
@@ -188,6 +188,7 @@ def create_company():
     if code and name and email:
         result = mongo.db.companies.insert_one(
             {
+                "code": code,
                 "name": name,
                 "website": website,
                 "email": email,
