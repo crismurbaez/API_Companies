@@ -224,7 +224,7 @@ def create_company():
 @app.route("/error", methods=["POST"])
 def create_error():
     error = request.json
-    result = mongo.db.companies.insert_one(error)
+    result = mongo.db.error.insert_one(error)
     response = json_util.dumps(result)
     response_json = Response(response, mimetype="application/json").json
     response_message = jsonify(
@@ -237,7 +237,7 @@ def create_error():
 
 @app.route("/error", methods=["GET"])
 def get_error():
-    result = mongo.db.companies.find()
+    result = mongo.db.error.find()
     response = json_util.dumps(result)
     response_json = Response(response, mimetype="application/json").json
     response_message = jsonify(
