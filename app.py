@@ -214,6 +214,36 @@ def create_company():
         return error_create("Invalid Data")
 
 
+# guarda los errores en los envíos de emails
+@app.route("/error", methods=["POST"])
+def create_error():
+    error = request.json
+    result = mongo.db.companies.insert_one(error)
+    response = json_util.dumps(result)
+    response_json = Response(response, mimetype="application/json").json
+    response_message = jsonify(
+        {
+            "message": response_json,
+        }
+    )
+    return response_message
+
+
+@app.route("/error", methods=["GET"])
+def get_error():
+    result = mongo.db.companies.find()
+    response = json_util.dumps(result)
+    response_json = Response(response, mimetype="application/json").json
+    response_message = jsonify(
+        {
+            "message": "Listing all companies successfully",
+            "services": response_json,
+        }
+    )
+    response_message.status_code = 200
+    return response_message
+
+
 # cuando ocurre un error va a ser manejado con estas funciones
 @app.errorhandler(404)
 def not_found(error=404):
