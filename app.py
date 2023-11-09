@@ -57,6 +57,12 @@ def index():
                     "details": "String details",
                 },
             },
+            {
+                "route": "/error",
+                "method": "GET",
+                "result": "List all errors",
+            },
+            {"route": "/error", "method": "POST", "result": "New error", "body": "any"},
         ],
     }
 
