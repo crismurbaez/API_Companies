@@ -223,7 +223,7 @@ def create_company():
 # guarda los errores en los envíos de emails
 @app.route("/error", methods=["POST"])
 def create_error():
-    error = request.json
+    error = request.json()
     result = mongo.db.error.insert_one(error)
     response = json_util.dumps(result)
     response_json = Response(response, mimetype="application/json").json
