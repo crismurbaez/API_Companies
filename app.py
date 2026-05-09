@@ -84,7 +84,7 @@ def get_companies():
     return response_message
 
 
-@app.route("/company/<code>", methods=["GET"])
+@app.route("/company/<int:code>", methods=["GET"])
 def get_company(code):
     result = mongo.db.companies.find_one({"code": code})
     if result is not None:
@@ -110,7 +110,7 @@ def get_company(code):
         return not_found()
 
 
-@app.route("/company/<code>", methods=["DELETE"])
+@app.route("/company/<int:code>", methods=["DELETE"])
 def company_delete(code):
     result = mongo.db.companies.delete_one({"code": code})
     if result.deleted_count == 1:
@@ -122,7 +122,7 @@ def company_delete(code):
         return not_found()
 
 
-@app.route("/company/<code>", methods=["PUT"])
+@app.route("/company/<int:code>", methods=["PUT"])
 def update_company(code):
     name, website, email, te, link_origin, country, details = request.json.values()
     if name and email:
@@ -173,16 +173,15 @@ def update_company(code):
 
 @app.route("/company", methods=["POST"])
 def create_company():
-    (
-        code,
-        name,
-        website,
-        email,
-        te,
-        link_origin,
-        country,
-        details,
-    ) = request.json.values()
+    data = request.json
+    code = int(data.get("code"))
+    name = data.get("name")
+    website = data.get("website")
+    email = data.get("email")
+    te = data.get("te")
+    link_origin = data.get("link_origin")
+    country = data.get("country")
+    details = data.get("details")
     # Consulto si ya existe una company con ese code
     result_get = get_company(code)
     if result_get.status_code != 404:
