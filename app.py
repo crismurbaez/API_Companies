@@ -71,7 +71,7 @@ def index():
 
 @app.route("/companies", methods=["GET"])
 def get_companies():
-    result = mongo.db.companies.find()
+    result = mongo.db.companies.find().sort("code", 1)
     response = json_util.dumps(result)
     response_json = Response(response, mimetype="application/json").json
     response_message = jsonify(
