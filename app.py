@@ -210,10 +210,7 @@ def create_company():
 @app.route("/error", methods=["POST"])
 def create_error():
     error = request.json
-    result = mongo.db.error.insert_one(error)
-
-    if result is None:
-        abort(400, description="Error creating resource")
+    result = mongo.db.error.insert_one(error) # Si esto falla, Flask lanza error 500 solo que lo captura mi manejador de errores
 
     return jsonify({
         "message": "Error logged successfully",
