@@ -1,8 +1,6 @@
-from flask import Flask, request, jsonify, Response, abort
+from flask import Flask, request, jsonify, abort
 from flask_pymongo import PyMongo
 from flask_cors import CORS
-from werkzeug.security import generate_password_hash, check_password_hash
-from bson import json_util
 from dotenv import load_dotenv
 import os
 
@@ -77,13 +75,13 @@ def get_companies():
     result = mongo.db.companies.find().sort("code", 1)
     companies = []
 
-    if result is None:
-        abort(404, description="No companies were found in the database")
-    
     for doc in result:
         doc["_id"] = str(doc["_id"])
         companies.append(doc)
 
+    if len(companies) == 0:
+        abort(404, description="No companies were found in the database")
+    
     return jsonify({
         "message": "Listing all companies successfully",
         "services": companies}), 200
@@ -91,6 +89,7 @@ def get_companies():
 @app.route("/company/<int:code>", methods=["GET"])
 def get_company(code):
     result = mongo.db.companies.find_one({"code": code})
+
     if result is None:
         abort(404, description=f"The company with code {code} does not exist")
 
@@ -147,15 +146,15 @@ def update_company(code):
         if result is None:
             abort(404, description=f"The company with code {code} does not exist")
 
-    # Convertimos el ID del documento antiguo que devuelve Mongo
-    result["_id"] = str(result["_id"])
+        # Convertimos el ID del documento antiguo que devuelve Mongo
+        result["_id"] = str(result["_id"])
 
-    response_message = {
-        "message": "service updated successfully",
-        "service_new": data,
-        "service_old": result
-    }
-    return jsonify(response_message), 200
+        response_message = {
+            "message": "service updated successfully",
+            "service_new": data,
+            "service_old": result
+        }
+        return jsonify(response_message), 200
 
 @app.route("/company", methods=["POST"])
 def create_company():
