@@ -9,11 +9,11 @@ import os
 load_dotenv()
 MONGO_URI_ENV = os.getenv("MONGO_URI_ENV")
 
-app = Flask(__name__)
-CORS(app)
-
 if not MONGO_URI_ENV:
     raise ValueError("No MONGO_URI_ENV found in environment variables")
+
+app = Flask(__name__)
+CORS(app)
 app.config["MONGO_URI"] = MONGO_URI_ENV
 
 mongo = PyMongo(app)
@@ -83,7 +83,7 @@ def get_companies():
     for doc in result:
         doc["_id"] = str(doc["_id"])
         companies.append(doc)
-        
+
     return jsonify({
         "message": "Listing all companies successfully",
         "services": companies}), 200
@@ -147,34 +147,15 @@ def update_company(code):
         if result is None:
             abort(404, description=f"The company with code {code} does not exist")
 
-        response = json_util.dumps(result)
-        response_json = Response(response, mimetype="application/json").json
-        response_message = {
-            "message": "service updated successfully",
-            "_id": response_json["_id"],
-                "code": response_json["code"],
-                "service_new": {
-                    "name": name,
-                    "website": website,
-                    "email": email,
-                    "te": te,
-                    "link_origin": link_origin,
-                    "country": country,
-                    "details": details,
-                },
-                "service_old": {
-                    "name": response_json["name"],
-                    "website": response_json["website"],
-                    "email": response_json["email"],
-                    "te": response_json["te"],
-                    "link_origin": response_json["link_origin"],
-                    "country": response_json["country"],
-                    "details": response_json["details"],
-                },
-            }
-        
-        return jsonify(response_message), 200
+    # Convertimos el ID del documento antiguo que devuelve Mongo
+    result["_id"] = str(result["_id"])
 
+    response_message = {
+        "message": "service updated successfully",
+        "service_new": data,
+        "service_old": result
+    }
+    return jsonify(response_message), 200
 
 @app.route("/company", methods=["POST"])
 def create_company():
@@ -230,31 +211,30 @@ def create_company():
 @app.route("/error", methods=["POST"])
 def create_error():
     error = request.json
-    # print(error)
     result = mongo.db.error.insert_one(error)
-    response = json_util.dumps(result)
-    response_json = Response(response, mimetype="application/json").json
-    response_message = jsonify(
-        {
-            "message": response_json,
-        }
-    )
-    return response_message
+
+    if result is None:
+        abort(400, description="Error creating resource")
+
+    return jsonify({
+        "message": "Error logged successfully",
+        "_id": str(result.inserted_id)
+    }), 201 # 201 código "Creado"
 
 
 @app.route("/error", methods=["GET"])
 def get_error():
     result = mongo.db.error.find()
-    response = json_util.dumps(result)
-    response_json = Response(response, mimetype="application/json").json
-    response_message = jsonify(
-        {
-            "message": "Listing all companies successfully",
-            "services": response_json,
-        }
-    )
-    response_message.status_code = 200
-    return response_message
+    errors = []
+    for doc in result:
+        doc["_id"] = str(doc["_id"])
+        errors.append(doc)
+
+    return jsonify({
+        "message": "Listing all errors successfully",
+        "errors": errors
+    }), 200
+
 
 
 # cuando ocurre un error es manejado con estas funciones
